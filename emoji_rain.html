@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Rain</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+
+        .emoji {
+            position: absolute;
+            font-size: 2rem;
+            user-select: none;
+            pointer-events: none;
+            z-index: 1;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            text-align: center;
+        }
+
+        .controls h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .controls p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .status {
+            margin-top: 8px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .status.stopped {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>🌧️ Emoji Rain</h2>
+        <p>Press <strong>SPACEBAR</strong> to start/stop the rain</p>
+        <div class="status" id="status">Stopped</div>
+    </div>
+
+    <script>
+        class EmojiRain {
+            constructor() {
+                this.isRaining = false;
+                this.emojiInterval = null;
+                this.emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '☹️', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😓', '😩', '😫', '🥱', '😤', '😡', '😠', '🤬', '😈', '👿', '💀', '☠️', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'];
+                this.statusElement = document.getElementById('status');
+                
+                this.init();
+            }
+
+            init() {
+                // Listen for spacebar keypress
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        this.toggleRain();
+                    }
+                });
+
+                // Also listen for clicks on the control panel
+                document.querySelector('.controls').addEventListener('click', () => {
+                    this.toggleRain();
+                });
+            }
+
+            toggleRain() {
+                if (this.isRaining) {
+                    this.stopRain();
+                } else {
+                    this.startRain();
+                }
+            }
+
+            startRain() {
+                this.isRaining = true;
+                this.statusElement.textContent = 'Raining!';
+                this.statusElement.className = 'status';
+                
+                // Create emojis at regular intervals
+                this.emojiInterval = setInterval(() => {
+                    this.createEmoji();
+                }, 100); // Create a new emoji every 100ms
+            }
+
+            stopRain() {
+                this.isRaining = false;
+                this.statusElement.textContent = 'Stopped';
+                this.statusElement.className = 'status stopped';
+                
+                if (this.emojiInterval) {
+                    clearInterval(this.emojiInterval);
+                    this.emojiInterval = null;
+                }
+            }
+
+            createEmoji() {
+                const emoji = document.createElement('div');
+                emoji.className = 'emoji';
+                emoji.textContent = this.emojis[Math.floor(Math.random() * this.emojis.length)];
+                
+                // Random horizontal position
+                emoji.style.left = Math.random() * 100 + '%';
+                
+                // Random animation duration (2-4 seconds)
+                const duration = 2 + Math.random() * 2;
+                emoji.style.animationDuration = duration + 's';
+                
+                // Random size
+                const size = 1.5 + Math.random() * 1.5;
+                emoji.style.fontSize = size + 'rem';
+                
+                // Add to page
+                document.body.appendChild(emoji);
+                
+                // Remove emoji after animation completes
+                setTimeout(() => {
+                    if (emoji.parentNode) {
+                        emoji.parentNode.removeChild(emoji);
+                    }
+                }, duration * 1000);
+            }
+        }
+
+        // Start the emoji rain when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new EmojiRain();
+        });
+    </script>
+</body>
+</html>
